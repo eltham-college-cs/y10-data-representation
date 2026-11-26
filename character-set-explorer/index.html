@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Character Set Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0A1B2E;--gold:#C89B3C;--bg:#F7F8FA;--ink:#0A1B2E;--muted:#54657A;--line:#C3CDD8;--green:#2E8B57;--red:#B3261E;--blue:#2F6FD6;--orange:#C25A0E;--cream:#FFF4DC}
+*{box-sizing:border-box}
+body{margin:0;font-family:Montserrat,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:var(--navy);color:#fff;padding:22px 28px 0}
+header .kicker{color:var(--gold);font-weight:700;letter-spacing:.18em;font-size:12px}
+header h1{margin:6px 0 4px;font-size:30px}
+header p{margin:0 0 16px;color:#B8C6D6;font-size:15px}
+nav{display:flex;gap:6px;flex-wrap:wrap}
+nav button{font:inherit;font-weight:700;font-size:14px;border:0;border-radius:10px 10px 0 0;padding:11px 18px;background:#1B3148;color:#B8C6D6;cursor:pointer}
+nav button[aria-selected=true]{background:var(--bg);color:var(--navy)}
+main{max-width:1100px;margin:0 auto;padding:24px 20px 60px}
+.panel{display:none}.panel.on{display:block}
+.card{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:16px}
+.card h2{margin:0 0 10px;font-size:18px}
+.label{font-size:12px;font-weight:800;letter-spacing:.12em;color:var(--gold);text-transform:uppercase}
+input[type=text],input[type=number]{font:inherit;font-size:20px;font-weight:600;padding:10px 14px;border:2px solid var(--line);border-radius:10px;width:100%;color:var(--ink)}
+input:focus{outline:none;border-color:var(--gold)}
+.seg{display:inline-flex;border:2px solid var(--navy);border-radius:10px;overflow:hidden;margin:12px 0 4px}
+.seg button{font:inherit;font-weight:700;font-size:14px;border:0;background:#fff;color:var(--navy);padding:9px 14px;cursor:pointer}
+.seg button.on{background:var(--navy);color:var(--gold)}
+.mono{font-family:'JetBrains Mono',Consolas,monospace}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th{background:var(--navy);color:var(--gold);text-align:left;font-size:12px;letter-spacing:.1em;padding:9px 10px}
+td{padding:8px 10px;border-bottom:1px solid #E6EAF0;vertical-align:middle}
+td.ch{font-size:22px;font-weight:800;width:70px}
+.bad{color:var(--red);font-weight:700;font-size:13px}
+.ok{color:var(--green);font-weight:700;font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat{background:var(--navy);color:#fff;border-radius:12px;padding:14px 16px}
+.stat b{display:block;font-size:26px;color:var(--gold)}
+.stat span{font-size:13px;color:#B8C6D6;font-weight:600}
+.bars .row{display:grid;grid-template-columns:150px 1fr 120px;align-items:center;gap:10px;margin:8px 0;font-weight:700;font-size:14px}
+.bar{height:26px;border-radius:6px;background:#E9ECF1;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:6px;transition:width .4s}
+.formula{background:var(--cream);border:2px solid var(--gold);border-radius:10px;padding:10px 14px;font-weight:700;margin-top:12px}
+.grid{display:grid;grid-template-columns:repeat(13,1fr);gap:6px}
+.key{font:inherit;font-weight:800;font-size:18px;padding:10px 0;border-radius:8px;border:1.5px solid var(--line);background:#fff;color:var(--navy);cursor:pointer}
+.key:hover,.key.on{background:var(--navy);color:var(--gold);border-color:var(--navy)}
+.bits{display:flex;gap:6px;margin:10px 0}
+.bit{width:54px;text-align:center}
+.bit small{display:block;font-size:11px;color:var(--muted);font-weight:700;margin-bottom:4px}
+.bit div{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;border:1.5px solid var(--line);border-radius:8px;padding:8px 0;background:#fff}
+.bit.hl div{background:var(--cream);border-color:var(--gold);color:var(--orange)}
+.big{font-size:56px;font-weight:800;line-height:1}
+.flex{display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+.btn{font:inherit;font-weight:800;font-size:15px;border:0;border-radius:10px;padding:11px 18px;background:var(--navy);color:var(--gold);cursor:pointer}
+.btn.alt{background:#fff;color:var(--navy);border:2px solid var(--navy)}
+.q{font-size:20px;font-weight:700;margin:6px 0 14px}
+.fb{margin-top:12px;font-weight:700;min-height:24px}
+.score{font-weight:800;color:var(--navy)}
+.tag{display:inline-block;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:800;letter-spacing:.08em;color:#fff}
+.note{font-size:13px;color:var(--muted);margin-top:10px}
+@media(max-width:760px){.stats{grid-template-columns:1fr 1fr}.grid{grid-template-columns:repeat(7,1fr)}.bars .row{grid-template-columns:110px 1fr 90px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="kicker">YEAR 10 · OCR J277 1.2.4 · CHARACTERS</div>
+  <h1>Character Set Explorer</h1>
+  <p>Every character you type is stored as a number, and every number is stored in binary.</p>
+  <nav role="tablist">
+    <button role="tab" aria-selected="true" data-tab="explore">1 · Explore</button>
+    <button role="tab" aria-selected="false" data-tab="order">2 · The order of codes</button>
+    <button role="tab" aria-selected="false" data-tab="challenge">3 · Challenges</button>
+  </nav>
+</header>
+<main>
+<!-- EXPLORE -->
+<section class="panel on" id="p-explore">
+  <div class="card">
+    <div class="label">Type some text</div>
+    <input id="txt" type="text" value="Hello world" maxlength="60" autocomplete="off" spellcheck="false">
+    <div class="seg" id="enc">
+      <button data-bits="8" class="on">8-bit ASCII</button>
+      <button data-bits="16">16-bit Unicode</button>
+      <button data-bits="32">32-bit Unicode</button>
+    </div>
+    <div class="note">Try: your name · café · 你好 · 😀 · a space at the end</div>
+  </div>
+  <div class="stats">
+    <div class="stat"><b id="sChars">0</b><span>characters (spaces count!)</span></div>
+    <div class="stat"><b id="sBits">8</b><span>bits per character</span></div>
+    <div class="stat"><b id="sTotal">0</b><span>bits in total</span></div>
+    <div class="stat"><b id="sBytes">0</b><span>bytes (bits ÷ 8)</span></div>
+  </div>
+  <div class="formula" id="formula"></div>
+  <div class="card" style="margin-top:16px">
+    <h2>Same text, three character sets</h2>
+    <div class="bars" id="bars"></div>
+  </div>
+  <div class="card">
+    <h2>Each character, its code and its binary</h2>
+    <table><thead><tr><th>CHAR</th><th>DENARY CODE</th><th>BINARY</th><th>FITS?</th></tr></thead><tbody id="rows"></tbody></table>
+    <div class="note">GCSE simplification: Unicode is treated as a fixed 16 or 32 bits per character. Real files often use UTF-8, which varies the length (not needed for the exam).</div>
+  </div>
+</section>
+
+<!-- ORDER -->
+<section class="panel" id="p-order">
+  <div class="card">
+    <h2>Click a character</h2>
+    <div class="grid" id="keys"></div>
+  </div>
+  <div class="card">
+    <div class="flex">
+      <div class="big" id="oChar">A</div>
+      <div><div class="label">Denary code</div><div class="big" style="font-size:42px;color:var(--orange)" id="oCode">65</div></div>
+      <div><div class="label">Worked out from 'A' = 65</div><div style="font-size:20px;font-weight:700" id="oHow">This is A itself.</div></div>
+    </div>
+    <div class="bits" id="oBits"></div>
+    <div class="flex">
+      <button class="btn" id="flip">Flip the 32s bit (swap case)</button>
+      <button class="btn alt" id="prev">◀ code − 1</button>
+      <button class="btn alt" id="next">code + 1 ▶</button>
+    </div>
+    <div class="note">Notice: lowercase = uppercase + 32. Only the 32s bit changes. Digits '0'–'9' are characters too: '7' is stored as 55, not 7.</div>
+  </div>
+</section>
+
+<!-- CHALLENGE -->
+<section class="panel" id="p-challenge">
+  <div class="card">
+    <div class="flex" style="justify-content:space-between">
+      <div class="seg" id="lvl" style="margin:0">
+        <button data-l="must" class="on">A · Must</button>
+        <button data-l="should">B · Should</button>
+        <button data-l="could">C · Could</button>
+      </div>
+      <div class="score">Score: <span id="score">0</span> / <span id="tries">0</span> · Streak <span id="streak">0</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <span class="tag" id="qTag" style="background:var(--green)">A · MUST</span>
+    <div class="q" id="qText"></div>
+    <form id="qForm" class="flex" style="gap:10px">
+      <input id="ans" type="text" autocomplete="off" spellcheck="false" style="max-width:360px" placeholder="Your answer">
+      <button class="btn" type="submit">Check</button>
+      <button class="btn alt" type="button" id="skip">New question</button>
+    </form>
+    <div class="fb" id="fb"></div>
+  </div>
+  <div class="note">Binary answers: spaces are fine (0100 0001). Copy your best streak into OneNote.</div>
+</section>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const bin=(n,w)=>n.toString(2).padStart(w,'0').replace(/(.{4})(?=.)/g,'$1 ');
+// tabs
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.setAttribute('aria-selected',x===b));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.id==='p-'+b.dataset.tab));
+});
+// EXPLORE
+let bits=8;
+$('enc').querySelectorAll('button').forEach(b=>b.onclick=()=>{bits=+b.dataset.bits;$('enc').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));render();});
+$('txt').oninput=render;
+function fits(cp,w){return w===8?cp<=255:w===16?cp<=65535:true}
+function render(){
+  const chars=[...$('txt').value];
+  const n=chars.length,total=n*bits;
+  $('sChars').textContent=n;$('sBits').textContent=bits;$('sTotal').textContent=total.toLocaleString();$('sBytes').textContent=(total/8).toLocaleString();
+  $('formula').innerHTML=`${n} characters × ${bits} bits = ${total.toLocaleString()} bits ÷ 8 = <span style="color:var(--green)">${(total/8).toLocaleString()} bytes</span>`;
+  const max=Math.max(1,n*32);
+  $('bars').innerHTML=[[8,'8-bit ASCII','#C89B3C'],[16,'16-bit Unicode','#2F6FD6'],[32,'32-bit Unicode','#5B3E8C']].map(([w,l,c])=>
+    `<div class="row"><span>${l}</span><div class="bar"><i style="width:${n*w/max*100}%;background:${c}"></i></div><span>${(n*w/8).toLocaleString()} bytes</span></div>`).join('');
+  $('rows').innerHTML=chars.map(ch=>{
+    const cp=ch.codePointAt(0);const ok=fits(cp,bits);
+    const shown=ch===' '?'<span style="font-size:13px;color:var(--muted)">space</span>':ch;
+    let msg;
+    if(ok) msg=bits===8&&cp>127?'<span class="ok">✓ extended ASCII only</span>':'<span class="ok">✓ fits</span>';
+    else msg=bits===8?`<span class="bad">✗ not in ASCII: code ${cp} needs more than 8 bits</span>`:`<span class="bad">✗ code ${cp.toLocaleString()} needs more than 16 bits</span>`;
+    return `<tr><td class="ch">${shown}</td><td style="font-weight:700">${cp.toLocaleString()}</td><td class="mono" style="color:${ok?'var(--blue)':'var(--red)'}">${ok?bin(cp,bits):'—'}</td><td>${msg}</td></tr>`;
+  }).join('');
+}
+render();
+// ORDER
+const keyChars=[...'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'];
+let cur=65;
+$('keys').innerHTML=keyChars.map(c=>`<button class="key" data-c="${c.charCodeAt(0)}">${c}</button>`).join('');
+$('keys').querySelectorAll('.key').forEach(k=>k.onclick=()=>{cur=+k.dataset.c;showOrder();});
+$('flip').onclick=()=>{if(cur>=65&&cur<=90||cur>=97&&cur<=122){cur^=32;showOrder();}};
+$('prev').onclick=()=>{if(cur>32){cur--;showOrder();}};
+$('next').onclick=()=>{if(cur<126){cur++;showOrder();}};
+function how(c){
+  const ch=String.fromCharCode(c);
+  if(c===65)return 'This is A itself.';
+  if(c>65&&c<=90)return `${ch} is ${c-65} letter${c-65>1?'s':''} after A → 65 + ${c-65} = ${c}`;
+  if(c>=97&&c<=122)return `${ch.toUpperCase()} = ${c-32}, lowercase adds 32 → ${c-32} + 32 = ${c}`;
+  if(c>=48&&c<=57)return `The character '${ch}' is NOT stored as ${c-48}: digits start at '0' = 48`;
+  return 'Not a letter or digit: check a full ASCII table.';
+}
+function showOrder(){
+  $('oChar').textContent=cur===32?'␣':String.fromCharCode(cur);$('oCode').textContent=cur;$('oHow').textContent=how(cur);
+  const b=cur.toString(2).padStart(8,'0');const pv=[128,64,32,16,8,4,2,1];
+  $('oBits').innerHTML=[...b].map((d,i)=>`<div class="bit${i===2?' hl':''}"><small>${pv[i]}</small><div>${d}</div></div>`).join('');
+  $('keys').querySelectorAll('.key').forEach(k=>k.classList.toggle('on',+k.dataset.c===cur));
+}
+showOrder();
+// CHALLENGES
+let level='must',score=0,tries=0,streak=0,answer=null,explain='';
+const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const L=c=>String.fromCharCode(c);
+const gens={
+  must:[
+    ()=>{const b=R(1,8);return{q:`How many different characters can ${b} bit${b>1?'s':''} represent?`,a:String(2**b),e:`2^${b} = ${2**b}`};},
+    ()=>{const n=R(3,200);let b=1;while(2**b<n)b++;return{q:`A character set needs ${n} characters. What is the fewest number of bits per character?`,a:String(b),e:`2^${b-1} = ${2**(b-1)} is too few, 2^${b} = ${2**b} is enough → ${b} bits`};},
+    ()=>{const c=R(66,90);return{q:`'A' = 65. Write '${L(c)}' in 8-bit binary.`,a:bin(c,8),e:`${L(c)} is ${c-65} after A → ${c} → ${bin(c,8)}`};},
+    ()=>{const c=R(65,90);return{q:`'A' = 65 = 0100 0001. Which letter is ${bin(c,8)}?`,a:L(c),e:`${bin(c,8)} = ${c}, which is ${c-65} after A → ${L(c)}`};}
+  ],
+  should:[
+    ()=>{const g=R(65,85),t=R(g+1,90);return{q:`In ASCII, '${L(g)}' = ${g}. What is the denary code for '${L(t)}'?`,a:String(t),e:`${L(t)} is ${t-g} after ${L(g)} → ${g} + ${t-g} = ${t}`};},
+    ()=>{const c=R(65,90);return{q:`In ASCII, '${L(c)}' = ${c}. What is the denary code for lowercase '${L(c+32)}'?`,a:String(c+32),e:`lowercase = uppercase + 32 → ${c+32}`};},
+    ()=>{const n=R(5,60)*10,w=[8,16,32][R(0,2)];return{q:`A message has ${n} characters stored using ${w===8?'8-bit ASCII':w+'-bit Unicode'}. How many BYTES is it?`,a:String(n*w/8),e:`${n} × ${w} = ${n*w} bits ÷ 8 = ${n*w/8} bytes`};},
+    ()=>{const g=R(70,90),t=R(65,g-1);return{q:`In ASCII, '${L(g)}' = ${g}. Write '${L(t)}' in 8-bit binary.`,a:bin(t,8),e:`${L(t)} is ${g-t} before ${L(g)} → ${t} → ${bin(t,8)}`};}
+  ],
+  could:[
+    ()=>{const n=R(2,9)*1000;return{q:`An essay of ${n.toLocaleString()} characters is saved in 16-bit Unicode instead of 8-bit ASCII. How many MORE kilobytes (KB) does it use?`,a:String(n/1000),e:`ASCII ${n/1000} KB, Unicode ${n*2/1000} KB → ${n/1000} KB more`};},
+    ()=>{const c=R(97,122);return{q:`'a' = 0110 0001. Write '${L(c-32)}' (uppercase) in 8-bit binary.`,a:bin(c-32,8),e:`'${L(c)}' = ${c}; uppercase = ${c} − 32 = ${c-32} → ${bin(c-32,8)}`};},
+    ()=>{const d=R(0,9);return{q:`'0' = 48. What is the character '${d}' in 8-bit binary?`,a:bin(48+d,8),e:`48 + ${d} = ${48+d} → ${bin(48+d,8)}`};},
+    ()=>{const kb=R(2,8);return{q:`A ${kb} KB text file uses 8-bit ASCII. How many characters does it hold?`,a:String(kb*1000),e:`${kb} KB = ${kb*1000} bytes; 1 byte per character → ${kb*1000}`};}
+  ]
+};
+function newQ(){
+  const list=gens[level];const g=list[R(0,list.length-1)]();answer=g.a;explain=g.e;
+  $('qText').textContent=g.q;$('ans').value='';$('fb').textContent='';$('ans').focus({preventScroll:true});
+  const cols={must:['var(--green)','A · MUST'],should:['var(--gold)','B · SHOULD'],could:['var(--red)','C · COULD']}[level];
+  $('qTag').style.background=cols[0];$('qTag').textContent=cols[1];
+}
+const norm=s=>s.replace(/[\s,]/g,'').toUpperCase();
+$('qForm').onsubmit=e=>{e.preventDefault();if(!$('ans').value.trim())return;tries++;
+  const right=norm($('ans').value)===norm(answer);
+  if(right){score++;streak++;$('fb').innerHTML=`<span style="color:var(--green)">✓ Correct. ${explain}</span>`;setTimeout(newQ,1600);}
+  else{streak=0;$('fb').innerHTML=`<span style="color:var(--red)">✗ Not quite. Answer: ${answer}. ${explain}</span>`;}
+  $('score').textContent=score;$('tries').textContent=tries;$('streak').textContent=streak;};
+$('skip').onclick=newQ;
+$('lvl').querySelectorAll('button').forEach(b=>b.onclick=()=>{level=b.dataset.l;$('lvl').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));newQ();});
+newQ();
+</script>
+</body>
+</html>
